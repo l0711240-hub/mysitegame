@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마법 상점의 비밀 - 주사위 어드벤처</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #4a4a4a;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .stats-bar {
+            background: #fff5e6;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-around;
+            border-bottom: 2px solid #ffd89b;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .story-text {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #ffd89b;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .choice-btn {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border: none;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            color: #4a4a4a;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .choice-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .choice-btn.dice-choice {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            position: relative;
+            padding-right: 60px;
+        }
+
+        .choice-btn.dice-choice::after {
+            content: '🎲';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5em;
+        }
+
+        .dice-container {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .dice {
+            font-size: 5em;
+            margin: 20px 0;
+            display: inline-block;
+            animation: roll 0.5s ease-in-out;
+        }
+
+        @keyframes roll {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(90deg); }
+            50% { transform: rotate(180deg); }
+            75% { transform: rotate(270deg); }
+        }
+
+        .dice-info {
+            font-size: 1.1em;
+            color: #4a4a4a;
+            margin: 10px 0;
+        }
+
+        .dice-result {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .dice-result.success {
+            color: #51cf66;
+            border: 3px solid #51cf66;
+        }
+
+        .dice-result.failure {
+            color: #ff6b6b;
+            border: 3px solid #ff6b6b;
+        }
+
+        .roll-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .roll-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .continue-btn {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: #4a4a4a;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .continue-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .ending {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .ending-title {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .ending-text {
+            font-size: 1.2em;
+            line-height: 1.8;
+            color: #4a4a4a;
+            margin-bottom: 30px;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .modifier-badge {
+            display: inline-block;
+            background: #51cf66;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin: 10px 5px;
+        }
+
+        .modifier-badge.negative {
+            background: #ff6b6b;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>🔮 마법 상점의 비밀 🔮</h1>
+            <p>당신의 선택이 운명을 결정합니다</p>
+        </div>
+        
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-label">현재 장면</div>
+                <div class="stat-value" id="scene-number">1</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">행운 보정</div>
+                <div class="stat-value" id="luck-modifier">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">신뢰도</div>
+                <div class="stat-value" id="trust-level">0</div>
+            </div>
+        </div>
+        
+        <div class="content" id="game-content">
+            <!-- 게임 콘텐츠가 여기에 동적으로 로드됩니다 -->
+        </div>
+    </div>
+
+    <script>
+        // 게임 상태 관리
+        const gameState = {
+            currentScene: 'start',
+            luckModifier: 0,
+            trustLevel: 0,
+            sceneNumber: 1,
+            hasKey: false,
+            knowsSecret: false,
+            helpedOldWoman: false
+        };
+
+        // 시나리오 데이터
+        const scenarios = {
+            start: {
+                text: `당신은 오래된 골목길을 걷다가 신비로운 빛이 새어 나오는 작은 가게를 발견합니다. 
+                
+문 위에는 "마법 상점 - 운명을 찾는 이에게만 보입니다"라는 간판이 걸려 있습니다. 가게 안에서는 은은한 종소리와 함께 달콤한 향기가 흘러나옵니다.
+
+밖에서는 비가 내리기 시작하고, 당신은 선택의 기로에 섭니다.`,
+                choices: [
+                    { text: '🚪 가게에 들어간다', next: 'enterShop' },
+                    { text: '🔍 창문으로 안을 먼저 살핀다', next: 'peekWindow' },
+                    { text: '🚶 지나친다', next: 'walkAway' }
+                ]
+            },
+
+            peekWindow: {
+                text: `창문으로 안을 들여다보니, 수많은 신비로운 물건들로 가득 찬 가게가 보입니다. 
+                
+선반에는 빛나는 수정구슬들, 오래된 책들, 그리고 정체를 알 수 없는 물약병들이 놓여 있습니다. 가게 안쪽에서 노파가 당신을 향해 미소를 짓고 손짓으로 들어오라고 합니다.
+
+신중함이 당신의 행운을 높였습니다!`,
+                effects: { luckModifier: 1 },
+                choices: [
+                    { text: '🚪 이제 안심하고 들어간다', next: 'enterShop' },
+                    { text: '👋 미소로 답하고 떠난다', next: 'walkAway' }
+                ]
+            },
+
+            walkAway: {
+                text: `당신은 수상한 가게를 지나쳐 걷기로 결정합니다. 
+                
+몇 걸음 가지 않아 비가 폭우로 변하고, 당신은 흠뻑 젖게 됩니다. 집으로 돌아가는 길에 문득 가게의 모습이 머릿속에서 지워지지 않습니다. 
+
+다음 날, 같은 골목을 지나갔지만 그 가게는 흔적도 없이 사라져 있었습니다.`,
+                ending: 'ordinary',
+                endingTitle: '평범한 결말',
+                endingText: `당신은 신비로운 경험을 할 기회를 놓쳤습니다. 하지만 때로는 알지 못하는 것이 축복일 수도 있습니다. 평범한 일상으로 돌아간 당신은 그 날의 일을 이상한 꿈처럼 기억하게 됩니다.`
+            },
+
+            enterShop: {
+                text: `종소리와 함께 문을 열고 들어서자, 가게 안은 겉보기보다 훨씬 넓습니다. 
+                
+수정구슬들이 은은한 빛을 내며 방을 밝히고 있고, 공기 중에는 라벤더와 샌달우드 향이 감돕니다. 카운터 뒤에서 은빛 머리의 노파가 당신을 바라보며 말합니다.
+
+"어서 오세요, 기다리고 있었답니다. 당신은 선택받은 이군요."`,
+                choices: [
+                    { text: '💬 "무슨 말씀이신가요?" 정중하게 묻는다', next: 'politeQuestion' },
+                    { text: '🎯 "저는 그냥 우연히 지나가다가..." 솔직하게 말한다', next: 'honestAnswer' },
+                    { text: '🛍️ "물건을 사러 왔습니다" 단도직입적으로 말한다', next: 'directApproach' }
+                ]
+            },
+
+            politeQuestion: {
+                text: `노파는 만족스러운 미소를 지으며 대답합니다.
+
+"예의 바른 손님이군요. 이 가게는 진정으로 필요한 이들에게만 보입니다. 당신 안에는 특별한 운명이 있어요."
+
+그녀는 선반에서 작은 보석함을 꺼내 보여줍니다. "이 안에는 당신의 미래를 바꿀 물건이 있습니다. 하지만 그것을 얻기 위해서는 시험을 통과해야 해요."`,
+                effects: { trustLevel: 1 },
+                choices: [
+                    { text: '✨ "무슨 시험인가요?" 호기심을 보인다', next: 'acceptTest' },
+                    { text: '🤔 "먼저 그 물건이 무엇인지 알 수 있을까요?" 신중하게 묻는다', next: 'askAboutItem' }
+                ]
+            },
+
+            honestAnswer: {
+                text: `노파가 부드럽게 웃습니다.
+
+"솔직함은 훌륭한 자질이에요. 우연 같은 것은 없답니다. 모든 만남에는 이유가 있지요."
+
+그녀는 차를 따르며 계속 말합니다. "당신에게는 선택의 기로가 다가오고 있어요. 여기서 얻게 될 것이 당신을 도울 수 있습니다."`,
+                effects: { trustLevel: 1, luckModifier: 1 },
+                choices: [
+                    { text: '☕ 차를 받아 마신다', next: 'drinkTea' },
+                    { text: '📚 선반의 책들을 둘러본다', next: 'lookAtBooks' }
+                ]
+            },
+
+            directApproach: {
+                text: `노파의 표정이 약간 굳어집니다.
+
+"그렇군요... 하지만 이곳은 일반적인 상점이 아닙니다. 여기서는 돈으로 살 수 없는 것들을 다룹니다."
+
+분위기가 다소 차가워진 것을 느낍니다. 그녀는 당신을 평가하는 듯한 눈빛으로 바라봅니다.`,
+                effects: { trustLevel: -1 },
+                choices: [
+                    { text: '🙏 "죄송합니다. 제가 무례했네요" 사과한다', next: 'apologize' },
+                    { text: '💰 "그렇다면 무엇을 원하시나요?" 직접적으로 묻는다', next: 'askPrice' }
+                ]
+            },
+
+            acceptTest: {
+                text: `"좋아요," 노파가 고개를 끄덕입니다. "시험은 간단합니다. 세 개의 문이 있는 방으로 안내할게요. 하나를 선택해야 합니다."
+
+그녀가 손을 휘두르자 가게 뒤쪽에 숨겨진 문이 나타납니다. 문 너머로 희미한 빛이 보입니다.
+
+"각 문 뒤에는 다른 시험이 기다리고 있어요. 당신의 직감을 믿으세요."`,
+                choices: [
+                    { text: '🔵 파란 빛이 새어 나오는 왼쪽 문', next: 'blueDoor' },
+                    { text: '🟡 황금빛이 감도는 가운데 문', next: 'goldenDoor' },
+                    { text: '🔴 붉은 기운이 느껴지는 오른쪽 문', next: 'redDoor' }
+                ]
+            },
+
+            askAboutItem: {
+                text: `노파가 신중한 표정으로 말합니다.
+
+"현명한 질문이에요. 보석함 안에는 '운명의 나침반'이 들어있습니다. 이것은 당신이 중요한 선택을 해야 할 때, 가장 좋은 길을 가리켜 줍니다."
+
+그녀는 잠시 멈춘 후 덧붙입니다. "하지만 이것은 공짜로 주어지지 않습니다. 당신의 용기를 증명해야 해요."`,
+                effects: { knowsSecret: true },
+                choices: [
+                    { text: '💪 "시험을 받겠습니다" 결연하게 말한다', next: 'acceptTest' },
+                    { text: '🤝 "다른 방법은 없나요?" 대안을 찾는다', next: 'seekAlternative' }
+                ]
+            },
+
+            drinkTea: {
+                text: `차를 마시자 따뜻함이 온몸에 퍼집니다. 맛은 예상과 달리 꿀과 민트 향이 조화롭게 어우러져 있습니다.
+
+"이 차는 '명료의 차'라고 불립니다," 노파가 설명합니다. "당신의 직감을 날카롭게 해줄 거예요."
+
+갑자기 가게 안의 모든 것이 더 선명하게 보이기 시작합니다. 각 물건들이 미세하게 빛나고 있습니다.`,
+                effects: { luckModifier: 2 },
+                choices: [
+                    { text: '✨ 가장 밝게 빛나는 수정구슬을 가리킨다', next: 'pointCrystal' },
+                    { text: '📖 오래된 책 한 권이 당신을 부르는 듯하다', next: 'touchBook' }
+                ]
+            },
+
+            lookAtBooks: {
+                text: `책장으로 다가가자, 오래된 가죽으로 제본된 책들이 가득합니다. 하나의 책이 유독 당신의 시선을 끕니다.
+
+책등에는 "운명을 읽는 자들을 위한 안내서"라고 적혀 있습니다. 책을 펼치자 금빛 글씨로 글자들이 나타나기 시작합니다.
+
+"독자여, 당신은 선택의 순간에 서 있습니다..."`,
+                effects: { knowsSecret: true, luckModifier: 1 },
+                choices: [
+                    { text: '📚 책을 계속 읽는다', next: 'readBook' },
+                    { text: '👵 노파에게 이 책에 대해 묻는다', next: 'askAboutBook' }
+                ]
+            },
+
+            blueDoor: {
+                text: `파란 문을 열자 작은 방이 나타납니다. 방 한가운데 크리스탈 탁자 위에 빛나는 주사위가 놓여 있습니다.
+
+벽에 글자가 새겨져 있습니다: "지혜의 시험 - 주사위를 굴려 4 이상이 나오면 통과합니다. 당신의 선택이 쌓아온 운이 함께할 것입니다."
+
+주사위가 은은하게 푸른 빛을 발하고 있습니다.`,
+                diceRoll: {
+                    target: 4,
+                    success: 'blueDoorSuccess',
+                    failure: 'blueDoorFailure',
+                    description: '지혜의 시험'
+                }
+            },
+
+            blueDoorSuccess: {
+                text: `주사위가 멈추고 ${gameState.lastRoll}이 나왔습니다! 푸른 빛이 강렬해지며 방 전체를 감쌉니다.
+
+"훌륭합니다!" 노파의 목소리가 들립니다. "지혜로운 선택과 행운이 함께했군요."
+
+보석함이 천천히 열리며 아름다운 나침반이 모습을 드러냅니다. 바늘은 황금빛으로 빛나며 천천히 회전합니다.`,
+                ending: 'wisdom',
+                endingTitle: '지혜의 승리',
+                endingText: `당신은 운명의 나침반을 손에 넣었습니다. 이제 당신의 인생에서 중요한 결정을 내릴 때마다 나침반이 최선의 길을 가리켜 줄 것입니다. 당신의 지혜와 신중함이 가져온 보상입니다.`
+            },
+
+            blueDoorFailure: {
+                text: `주사위가 ${gameState.lastRoll}을 가리키며 멈춥니다. 푸른 빛이 점차 사라집니다.
+
+"아쉽군요," 노파가 나타나 말합니다. "하지만 실패도 배움의 한 형태입니다."
+
+그녀는 작은 크리스탈 조각을 건넵니다. "이것은 작은 선물입니다. 언젠가 당신에게 도움이 될 거예요."`,
+                ending: 'learning',
+                endingTitle: '배움의 길',
+                endingText: `비록 시험에는 실패했지만, 당신은 귀중한 경험을 얻었습니다. 노파가 준 크리스탈은 위험의 순간에 따뜻하게 빛나며 당신을 보호해줄 것입니다. 모든 실패는 다음 성공의 밑거름이 됩니다.`
+            },
+
+            goldenDoor: {
+                text: `황금 문을 열자 찬란한 빛이 쏟아져 나옵니다. 방 안에는 황금 저울이 놓여 있고, 한쪽에는 깃털이, 다른 쪽에는 주사위가 올려져 있습니다.
+
+"균형의 시험입니다," 노파의 목소리가 울립니다. "주사위를 굴려 5 이상이 나오면 저울의 균형이 맞춰집니다."
+
+이것은 더 어려운 도전이지만, 당신의 행운 보정이 도움이 될 것입니다.`,
+                diceRoll: {
+                    target: 5,
+                    success: 'goldenDoorSuccess',
+                    failure: 'goldenDoorFailure',
+                    description: '균형의 시험'
+                }
+            },
+
+            goldenDoorSuccess: {
+                text: `${gameState.lastRoll}! 주사위가 완벽한 숫자를 보여줍니다. 저울이 균형을 이루며 황금빛이 폭발합니다.
+
+방 전체가 빛으로 가득 차고, 당신 앞에 세 개의 물건이 나타납니다: 운명의 나침반, 투명한 수정구슬, 그리고 빛나는 열쇠.
+
+"완벽한 균형을 이루었군요," 노파가 미소 짓습니다. "당신은 세 가지 모두를 가질 자격이 있습니다."`,
+                ending: 'perfect',
+                endingTitle: '완벽한 균형',
+                endingText: `당신은 최고의 보상을 얻었습니다. 운명의 나침반은 미래를 안내하고, 수정구슬은 진실을 보여주며, 황금 열쇠는 모든 닫힌 문을 열어줄 것입니다. 당신의 균형 잡힌 접근과 행운이 완벽한 결말을 만들어냈습니다.`
+            },
+
+            goldenDoorFailure: {
+                text: `주사위는 ${gameState.lastRoll}을 보여줍니다. 저울이 기울며 황금빛이 희미해집니다.
+
+"균형을 이루지 못했군요," 노파가 나타납니다. "하지만 당신의 도전은 가치가 있었습니다."
+
+그녀는 작은 황금 부적을 건넵니다. "이것은 당신을 작은 불운으로부터 보호해줄 거예요."`,
+                ending: 'protection',
+                endingTitle: '보호의 부적',
+                endingText: `시험에는 실패했지만, 당신의 용기는 인정받았습니다. 황금 부적은 당신의 인생에서 작지만 의미 있는 순간들을 보호해줄 것입니다. 때로는 작은 보호가 큰 행운보다 중요할 수 있습니다.`
+            },
+
+            redDoor: {
+                text: `붉은 문을 열자 열기가 느껴집니다. 방 안은 붉은 벨벳으로 장식되어 있고, 중앙에 불타는 듯한 주사위가 놓여 있습니다.
+
+"용기의 시험입니다," 벽의 글씨가 빛납니다. "주사위를 굴려 3 이상이 나오면 통과합니다. 이것은 가장 쉬운 도전이지만, 보상도 그에 맞습니다."
+
+주사위가 붉게 맥동하고 있습니다.`,
+                diceRoll: {
+                    target: 3,
+                    success: 'redDoorSuccess',
+                    failure: 'redDoorFailure',
+                    description: '용기의 시험'
+                }
+            },
+
+            redDoorSuccess: {
+                text: `주사위가 ${gameState.lastRoll}을 보여줍니다! 붉은 불꽃이 춤추며 방을 가득 채웁니다.
+
+"용감한 선택이었습니다," 노파가 나타나 박수를 칩니다.
+
+작은 루비가 박힌 목걸이가 당신에게 주어집니다. "이것은 용기의 목걸이입니다. 두려운 순간에 당신에게 힘을 줄 거예요."`,
+                ending: 'courage',
+                endingTitle: '용기의 보상',
+                endingText: `당신은 용기의 목걸이를 얻었습니다. 이 목걸이는 당신이 두려움에 직면할 때마다 따뜻한 힘을 불어넣어 줄 것입니다. 때로는 가장 단순한 용기가 가장 큰 변화를 만들어냅니다.`
+            },
+
+            redDoorFailure: {
+                text: `주사위가 ${gameState.lastRoll}에 멈춥니다. 붉은 빛이 사라지며 방이 어두워집니다.
+
+노파가 안타까운 표정으로 나타납니다. "아쉽습니다. 하지만 도전한 용기는 인정받아야 합니다."
+
+그녀는 작은 붉은 깃털을 건넵니다. "작은 선물입니다. 기억으로 간직하세요."`,
+                ending: 'memory',
+                endingTitle: '추억의 깃털',
+                endingText: `비록 원하던 것을 얻지는 못했지만, 당신은 특별한 경험을 했습니다. 붉은 깃털은 당신에게 이 날의 모험을 상기시켜 줄 것이며, 언젠가 그 경험이 예상치 못한 곳에서 도움이 될지도 모릅니다.`
+            },
+
+            apologize: {
+                text: `당신의 진심 어린 사과에 노파의 표정이 부드러워집니다.
+
+"사과할 줄 아는 것도 훌륭한 자질입니다. 다시 시작해볼까요?"
+
+그녀는 따뜻한 미소와 함께 차를 내립니다. 분위기가 다시 편안해집니다.`,
+                effects: { trustLevel: 0, luckModifier: 1 },
+                choices: [
+                    { text: '☕ 감사히 차를 받는다', next: 'drinkTea' },
+                    { text: '💬 "이 가게에 대해 더 알고 싶습니다" 물어본다', next: 'askAboutShop' }
+                ]
+            },
+
+            askAboutShop: {
+                text: `노파가 주변을 둘러보며 이야기를 시작합니다.
+
+"이 가게는 수백 년 동안 이곳에 있었답니다. 하지만 필요한 사람들에게만 모습을 드러내지요. 여기 있는 모든 물건들은 특별한 힘을 가지고 있어요."
+
+그녀는 당신을 바라보며 말합니다. "당신도 특별한 순간을 위해 이곳에 온 것입니다."`,
+                choices: [
+                    { text: '🎯 "저는 무엇을 해야 하나요?" 묻는다', next: 'acceptTest' },
+                    { text: '📚 선반의 물건들을 더 자세히 살펴본다', next: 'lookAtBooks' }
+                ]
+            },
+
+            readBook: {
+                text: `책을 읽어 내려가자 당신의 과거와 현재가 글자로 나타납니다. 그리고 미래의 갈림길이 보입니다.
+
+마지막 페이지에 도달하자 글씨가 나타납니다: "진실을 아는 자는 시험을 통과할 확률이 높아진다."
+
+책이 따뜻한 빛을 내며 당신의 손에서 사라집니다. 그 지식이 당신 안에 남아있습니다.`,
+                effects: { luckModifier: 2, knowsSecret: true },
+                choices: [
+                    { text: '💫 이제 시험을 받을 준비가 되었다', next: 'acceptTest' }
+                ]
+            },
+
+            askAboutBook: {
+                text: `"아," 노파가 놀란 표정을 짓습니다. "그 책을 발견했군요. 그것은 '운명의 기록'이라고 불립니다."
+
+"그 책은 독자의 과거와 미래를 보여줍니다. 하지만 미래는 당신의 선택에 따라 변할 수 있지요."
+
+그녀는 진지한 표정으로 덧붙입니다. "책을 읽으면 시험에서 유리해질 거예요."`,
+                choices: [
+                    { text: '📖 책을 읽기로 한다', next: 'readBook' },
+                    { text: '🚫 책을 읽지 않고 시험에 도전한다', next: 'acceptTest' }
+                ]
+            },
+
+            seekAlternative: {
+                text: `노파가 생각에 잠긴 표정을 짓습니다.
+
+"음... 다른 방법이 있긴 합니다. 가게 일을 도와주시면 나침반을 드릴 수 있어요."
+
+창밖을 가리키며 말합니다. "밖에 어려움에 처한 노인이 보이시나요? 그분을 도와주고 오신다면 시험 없이 보상을 드리겠습니다."`,
+                choices: [
+                    { text: '🤝 밖으로 나가 노인을 돕는다', next: 'helpOldMan' },
+                    { text: '⚡ "시험이 더 빠를 것 같습니다" 시험을 선택한다', next: 'acceptTest' }
+                ]
+            },
+
+            helpOldMan: {
+                text: `밖으로 나가니 비 속에서 무거운 짐을 들고 있는 노인이 보입니다. 당신은 주저 없이 다가가 짐을 들어드립니다.
+
+"감사합니다, 젊은이," 노인이 미소 짓습니다. "당신 같은 친절한 사람은 오랜만이에요."
+
+짐을 옮겨드리고 가게로 돌아오자 노파가 환한 미소로 맞이합니다.`,
+                effects: { helpedOldWoman: true, trustLevel: 2 },
+                choices: [
+                    { text: '✨ 가게로 들어간다', next: 'rewardForKindness' }
+                ]
+            },
+
+            rewardForKindness: {
+                text: `"당신의 친절함을 봤습니다," 노파가 말합니다. "진정한 마음씨를 가진 사람이군요."
+
+그녀는 보석함을 열고 운명의 나침반을 꺼냅니다. "이것은 당신의 것입니다. 시험이 필요 없어요."
+
+나침반이 당신 손에서 따뜻하게 빛납니다.`,
+                ending: 'kindness',
+                endingTitle: '친절의 보상',
+                endingText: `당신의 순수한 친절함이 가장 큰 보상을 가져왔습니다. 운명의 나침반은 이제 당신의 선한 마음과 조화를 이루며, 더욱 강력한 안내자가 될 것입니다. 진정한 마법은 타인을 돕는 마음에서 비롯됩니다.`
+            },
+
+            touchBook: {
+                text: `책에 손을 대는 순간, 따뜻한 에너지가 당신에게 흘러들어옵니다. 책장이 저절로 펼쳐지며 빛나는 글자들이 나타납니다.
+
+"선택받은 자여, 당신의 길은 밝습니다. 지혜와 용기를 가지고 나아가세요."
+
+책이 빛으로 변하며 당신의 몸속으로 스며듭니다.`,
+                effects: { luckModifier: 2, knowsSecret: true },
+                choices: [
+                    { text: '💫 "무슨 일이 일어난 건가요?" 노파에게 묻는다', next: 'explainMagic' }
+                ]
+            },
+
+            explainMagic: {
+                text: `"당신은 '지식의 책'과 연결되었습니다," 노파가 설명합니다. "이제 당신은 중요한 순간에 올바른 직감을 느낄 수 있을 거예요."
+
+"이것은 매우 드문 일입니다. 책이 스스로 주인을 선택한 거예요."
+
+그녀는 감동한 표정으로 말합니다. "당신에게 시험은 필요 없을 것 같군요."`,
+                effects: { trustLevel: 2 },
+                choices: [
+                    { text: '🎁 보상을 받는다', next: 'specialReward' }
+                ]
+            },
+
+            specialReward: {
+                text: `노파가 특별한 상자를 꺼냅니다. 안에는 운명의 나침반과 함께 빛나는 수정구슬이 들어있습니다.
+
+"책이 당신을 선택했으니, 두 가지 보물을 모두 드리겠습니다," 그녀가 말합니다. "나침반은 길을 안내하고, 수정구슬은 진실을 보여줄 거예요."
+
+두 물건이 당신의 손에서 조화롭게 빛납니다.`,
+                ending: 'chosen',
+                endingTitle: '선택받은 자',
+                endingText: `당신은 지식의 책에 의해 선택받았습니다. 운명의 나침반과 진실의 수정구슬, 두 가지 강력한 유물을 손에 넣었습니다. 당신의 앞길에는 위대한 운명이 기다리고 있으며, 이 도구들이 당신을 인도할 것입니다.`
+            },
+
+            pointCrystal: {
+                text: `당신이 가장 밝게 빛나는 수정구슬을 가리키자, 노파가 놀란 표정을 짓습니다.
+
+"명료의 차가 효과를 발휘했군요. 당신이 가리킨 것은 '진실의 수정'입니다. 이것은 가게에서 가장 가치 있는 물건 중 하나예요."
+
+그녀는 수정을 꺼내 당신에게 건넵니다. "이 정도 직감을 가진 당신이라면, 다른 시험 없이 이것을 드려도 될 것 같군요."`,
+                effects: { trustLevel: 2 },
+                ending: 'intuition',
+                endingTitle: '직감의 승리',
+                endingText: `당신의 날카로운 직감이 최고의 보물을 찾아냈습니다. 진실의 수정은 거짓과 진실을 구별할 수 있게 해주며, 당신의 결정을 더욱 명확하게 만들어 줄 것입니다. 직감은 때로 모든 시험보다 강력합니다.`
+            },
+
+            askPrice: {
+                text: `노파의 눈빛이 차갑게 변합니다.
+
+"당신은 여전히 이해하지 못하는군요. 이곳에서 거래되는 것은 돈이 아닙니다. 진심, 용기, 그리고 운명입니다."
+
+그녀는 한숨을 쉬며 말합니다. "아마 당신은 아직 준비가 되지 않은 것 같군요."`,
+                effects: { trustLevel: -2 },
+                ending: 'unprepared',
+                endingTitle: '준비되지 않은 마음',
+                endingText: `당신은 마법 상점의 진정한 의미를 이해하지 못한 채 떠났습니다. 때로는 타이밍이 맞지 않을 때가 있습니다. 하지만 언젠가 다시 기회가 찾아올지도 모릅니다. 그때는 더 열린 마음으로 임하게 될 것입니다.`
+            }
+        };
+
+        // UI 업데이트 함수
+        function updateStats() {
+            document.getElementById('scene-number').textContent = gameState.sceneNumber;
+            document.getElementById('luck-modifier').textContent = 
+                gameState.luckModifier > 0 ? `+${gameState.luckModifier}` : gameState.luckModifier;
+            document.getElementById('trust-level').textContent = gameState.trustLevel;
+        }
+
+        // 시나리오 표시 함수
+        function displayScene(sceneId) {
+            const scene = scenarios[sceneId];
+            const content = document.getElementById('game-content');
+            gameState.currentScene = sceneId;
+            gameState.sceneNumber++;
+            updateStats();
+
+            // 효과 적용
+            if (scene.effects) {
+                if (scene.effects.luckModifier) {
+                    gameState.luckModifier += scene.effects.luckModifier;
+                }
+                if (scene.effects.trustLevel) {
+                    gameState.trustLevel += scene.effects.trustLevel;
+                }
+                if (scene.effects.hasKey !== undefined) {
+                    gameState.hasKey = scene.effects.hasKey;
+                }
+                if (scene.effects.knowsSecret !== undefined) {
+                    gameState.knowsSecret = scene.effects.knowsSecret;
+                }
+                if (scene.effects.helpedOldWoman !== undefined) {
+                    gameState.helpedOldWoman = scene.effects.helpedOldWoman;
+                }
+                updateStats();
+            }
+
+            // 엔딩 체크
+            if (scene.ending) {
+                displayEnding(scene);
+                return;
+            }
+
+            // 주사위 체크
+            if (scene.diceRoll) {
+                displayDiceChallenge(scene);
+                return;
+            }
+
+            // 일반 시나리오 표시
+            let html = `
+                <div class="story-text">${scene.text.replace(/\n/g, '<br><br>')}</div>
+            `;
+
+            // 효과 배지 표시
+            if (scene.effects) {
+                html += '<div style="margin-bottom: 20px;">';
+                if (scene.effects.luckModifier > 0) {
+                    html += `<span class="modifier-badge">행운 +${scene.effects.luckModifier}</span>`;
+                } else if (scene.effects.luckModifier < 0) {
+                    html += `<span class="modifier-badge negative">행운 ${scene.effects.luckModifier}</span>`;
+                }
+                if (scene.effects.trustLevel > 0) {
+                    html += `<span class="modifier-badge">신뢰도 +${scene.effects.trustLevel}</span>`;
+                } else if (scene.effects.trustLevel < 0) {
+                    html += `<span class="modifier-badge negative">신뢰도 ${scene.effects.trustLevel}</span>`;
+                }
+                html += '</div>';
+            }
+
+            html += '<div class="choices">';
+            scene.choices.forEach((choice, index) => {
+                const isDiceChoice = scenarios[choice.next]?.diceRoll;
+                html += `
+                    <button class="choice-btn ${isDiceChoice ? 'dice-choice' : ''}" 
+                            onclick="makeChoice('${choice.next}')">
+                        ${choice.text}
+                    </button>
+                `;
+            });
+            html += '</div>';
+
+            content.innerHTML = html;
+        }
+
+        // 주사위 도전 표시
+        function displayDiceChallenge(scene) {
+            const content = document.getElementById('game-content');
+            const roll = scene.diceRoll;
+            
+            let html = `
+                <div class="story-text">${scene.text.replace(/\n/g, '<br><br>')}</div>
+                <div class="dice-container">
+                    <h3>${roll.description}</h3>
+                    <div class="dice-info">
+                        🎯 목표: ${roll.target} 이상<br>
+                        ✨ 현재 행운 보정: ${gameState.luckModifier > 0 ? '+' : ''}${gameState.luckModifier}
+                    </div>
+                    <div id="dice-result"></div>
+                    <button class="roll-btn" onclick="rollDice(${roll.target}, '${roll.success}', '${roll.failure}')">
+                        🎲 주사위 굴리기
+                    </button>
+                </div>
+            `;
+            
+            content.innerHTML = html;
+        }
+
+        // 주사위 굴리기
+        function rollDice(target, successScene, failureScene) {
+            const diceValue = Math.floor(Math.random() * 6) + 1;
+            const totalValue = diceValue + gameState.luckModifier;
+            const success = totalValue >= target;
+            
+            gameState.lastRoll = diceValue;
+            
+            const resultDiv = document.getElementById('dice-result');
+            resultDiv.innerHTML = `
+                <div class="dice">${['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'][diceValue - 1]}</div>
+                <div class="dice-info">
+                    주사위: ${diceValue}<br>
+                    행운 보정: ${gameState.luckModifier > 0 ? '+' : ''}${gameState.luckModifier}<br>
+                    <strong>최종 결과: ${totalValue}</strong>
+                </div>
+                <div class="dice-result ${success ? 'success' : 'failure'}">
+                    ${success ? '✅ 성공!' : '❌ 실패...'}
+                </div>
+                <button class="continue-btn" onclick="displayScene('${success ? successScene : failureScene}')">
+                    계속하기
+                </button>
+            `;
+            
+            // 버튼 비활성화
+            document.querySelector('.roll-btn').disabled = true;
+            document.querySelector('.roll-btn').style.opacity = '0.5';
+        }
+
+        // 엔딩 표시
+        function displayEnding(scene) {
+            const content = document.getElementById('game-content');
+            
+            let html = `
+                <div class="ending">
+                    <div class="ending-title">${scene.endingTitle}</div>
+                    <div class="story-text">${scene.text.replace(/\n/g, '<br><br>')}</div>
+                    <div class="ending-text">${scene.endingText}</div>
+                    <div style="margin-top: 20px;">
+                        <strong>게임 통계</strong><br>
+                        장면 수: ${gameState.sceneNumber}<br>
+                        최종 행운 보정: ${gameState.luckModifier}<br>
+                        신뢰도: ${gameState.trustLevel}
+                    </div>
+                    <button class="restart-btn" onclick="restartGame()">
+                        🔄 다시 시작하기
+                    </button>
+                </div>
+            `;
+            
+            content.innerHTML = html;
+        }
+
+        // 선택 처리
+        function makeChoice(nextScene) {
+            displayScene(nextScene);
+        }
+
+        // 게임 재시작
+        function restartGame() {
+            gameState.currentScene = 'start';
+            gameState.luckModifier = 0;
+            gameState.trustLevel = 0;
+            gameState.sceneNumber = 0;
+            gameState.hasKey = false;
+            gameState.knowsSecret = false;
+            gameState.helpedOldWoman = false;
+            gameState.lastRoll = 0;
+            
+            displayScene('start');
+        }
+
+        // 게임 시작
+        displayScene('start');
+    </script>
+</body>
+</html>
