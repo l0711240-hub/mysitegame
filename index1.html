@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모네타 내부 데이터베이스 시스템</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-top">
+            <div class="logo-section">
+                <div class="logo-icon">⚜</div>
+                <div>
+                    <div class="site-title">모네타 내부 데이터베이스</div>
+                    <div class="site-subtitle">프래그먼트 관리 시스템 v3.2.1</div>
+                </div>
+            </div>
+            <div class="user-info">
+                <div class="clearance-selector">
+                    <label for="clearanceLevel">보안 등급:</label>
+                    <select id="clearanceLevel" class="clearance-select">
+                        <option value="1">1등급</option>
+                        <option value="2">2등급</option>
+                        <option value="3" selected>3등급</option>
+                        <option value="4">4등급</option>
+                        <option value="5">5등급</option>
+                        <option value="6">6등급</option>
+                        <option value="7">7등급</option>
+                        <option value="8">8등급</option>
+                        <option value="9">9등급 (최고)</option>
+                    </select>
+                </div>
+                <span class="clearance-badge" id="clearanceBadge">보안등급: 3등급</span>
+                <span class="timestamp" id="currentTime"></span>
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav-container">
+        <ul class="nav-tabs">
+            <li class="nav-tab">
+                <a href="#overview" class="nav-link active" onclick="switchSection('overview', event)">
+                    <span>📊</span> 개요
+                </a>
+            </li>
+            <li class="nav-tab">
+                <a href="#organization" class="nav-link" onclick="switchSection('organization', event)">
+                    <span>🏛️</span> 조직 구조
+                </a>
+            </li>
+            <li class="nav-tab">
+                <a href="#charter" class="nav-link" onclick="switchSection('charter', event)">
+                    <span>📜</span> 헌장 및 규정
+                </a>
+            </li>
+            <li class="nav-tab">
+                <a href="#world" class="nav-link" onclick="switchSection('world', event)">
+                    <span>🗺️</span> 지역 정보
+                </a>
+            </li>
+            <li class="nav-tab">
+                <a href="#fragments" class="nav-link" onclick="switchSection('fragments', event)">
+                    <span>🔒</span> 프래그먼트 목록
+                </a>
+            </li>
+            <li class="nav-tab">
+                <a href="#timeline" class="nav-link" onclick="switchSection('timeline', event)">
+                    <span>📅</span> 기관 연혁
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="main-container">
+        <!-- 브레드크럼 -->
+        <div class="breadcrumb">
+            <span class="breadcrumb-item">🏠 홈</span>
+            <span class="breadcrumb-separator">›</span>
+            <span class="breadcrumb-item" id="breadcrumbCurrent">개요</span>
+        </div>
+
+        <!-- 개요 섹션 -->
+        <section id="overview" class="section active">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title">📊 시스템 개요</h1>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <span class="alert-icon">ℹ️</span>
+                        <div class="alert-content">
+                            <div class="alert-title">접근 권한 확인</div>
+                            <span id="overviewClearanceText">현재 3등급 권한으로 접속하였습니다. 일부 기밀 정보는 제한될 수 있습니다.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">등록 프래그먼트</div>
+                    <div class="stat-value" id="fragmentCount">1,847</div>
+                    <div class="stat-description">전체 등록 건수</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">재직 인원</div>
+                    <div class="stat-value" id="staffCount">3,200</div>
+                    <div class="stat-description">현재 활동 중인 직원</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">서명국</div>
+                    <div class="stat-value">28</div>
+                    <div class="stat-description">헌장 비준 국가</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">운영 지부</div>
+                    <div class="stat-value">5</div>
+                    <div class="stat-description">대륙별 지역 사무소</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">핵심 임무</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>구분</th>
+                                    <th>주요 업무</th>
+                                    <th>담당 부서</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="badge badge-primary">수집</span></td>
+                                    <td>전 세계 프래그먼트 발견 및 회수</td>
+                                    <td>각 부서 수집팀</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-primary">연구</span></td>
+                                    <td>발동 조건 분석 및 효과 파악</td>
+                                    <td>각 부서 연구팀</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-primary">보관</span></td>
+                                    <td>위험도별 차등 격리 및 관리</td>
+                                    <td>각 부서 보관팀</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-primary">대응</span></td>
+                                    <td>프래그먼트 사고 긴급 출동</td>
+                                    <td>해결사팀</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">운영 원칙</h2>
+                </div>
+                <div class="card-body">
+                    <div class="fragment-info-grid">
+                        <div class="info-item">
+                            <div class="info-label">비사용 원칙</div>
+                            <div class="info-value">프래그먼트 발동 금지</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">보존 우선</div>
+                            <div class="info-value">파괴는 최후의 수단</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">생명 우선</div>
+                            <div class="info-value">인명이 최우선 가치</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">정치적 중립</div>
+                            <div class="info-value">국가 분쟁 불개입</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 조직 구조 섹션 -->
+        <section id="organization" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title">🏛️ 조직 구조</h1>
+                </div>
+                <div class="card-body">
+                    <div class="org-chart">
+                        <div class="org-level">
+                            <div class="org-card level-1">
+                                <div class="org-position">기관장</div>
+                                <div class="org-name">[이름 미정]</div>
+                            </div>
+                        </div>
+                        
+                        <div class="org-connector"></div>
+                        
+                        <div class="org-level">
+                            <div class="org-card level-2">
+                                <div class="org-position">부기관장</div>
+                                <div class="org-name">세하야</div>
+                                <div class="org-note">(책 프랙트)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="org-connector"></div>
+                        
+                        <div class="org-level">
+                            <div class="org-card level-3">
+                                <div class="org-position">도서관</div>
+                                <div class="org-name">밀리아 아미스트라</div>
+                            </div>
+                            <div class="org-card level-3">
+                                <div class="org-position">무훈실</div>
+                                <div class="org-name">[이름 미정]</div>
+                            </div>
+                            <div class="org-card level-3">
+                                <div class="org-position">오케스트라</div>
+                                <div class="org-name">[이름 미정]</div>
+                            </div>
+                        </div>
+                        
+                        <div class="org-level">
+                            <div class="org-card level-3">
+                                <div class="org-position">미술관</div>
+                                <div class="org-name">[이름 미정]</div>
+                            </div>
+                            <div class="org-card level-3">
+                                <div class="org-position">의상실</div>
+                                <div class="org-name">[이름 미정]</div>
+                            </div>
+                            <div class="org-card level-3">
+                                <div class="org-position">일상유물관</div>
+                                <div class="org-name">[이름 미정]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">부서별 담당 영역</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>부서명</th>
+                                    <th>부서 코드</th>
+                                    <th>담당 프래그먼트</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>도서관</strong></td>
+                                    <td><span class="badge badge-secondary">LIB/LIR</span></td>
+                                    <td>서적, 문서, 사진, 편지</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>무훈실</strong></td>
+                                    <td><span class="badge badge-secondary">ARS/MOR</span></td>
+                                    <td>무기, 방어구, 전쟁 유물</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>오케스트라</strong></td>
+                                    <td><span class="badge badge-secondary">ORC</span></td>
+                                    <td>악기, 악보, 음악 관련</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>미술관</strong></td>
+                                    <td><span class="badge badge-secondary">GAL</span></td>
+                                    <td>회화, 조각, 예술작품</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>의상실</strong></td>
+                                    <td><span class="badge badge-secondary">WAR</span></td>
+                                    <td>의상, 장신구, 직물</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>일상유물관</strong></td>
+                                    <td><span class="badge badge-secondary">REP</span></td>
+                                    <td>기타 일상용품</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">공통 조직</h2>
+                </div>
+                <div class="card-body">
+                    <div class="fragment-info-grid">
+                        <div class="info-item">
+                            <div class="info-label">사업부</div>
+                            <div class="info-value">수익 창출 및 사업 운영</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">해결사팀</div>
+                            <div class="info-value">긴급 사고 대응</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">복잡도 연구팀</div>
+                            <div class="info-value">프래그먼트 상호작용 연구</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">사무처</div>
+                            <div class="info-value">행정, 인사, 재무</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">대외협력국</div>
+                            <div class="info-value">국가 관계 관리</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">법무팀</div>
+                            <div class="info-value">법률 자문 및 분쟁 해결</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 헌장 및 규정 섹션 -->
+        <section id="charter" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title">📜 모네타 헌장</h1>
+                    <span class="badge badge-danger">기밀 문서</span>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <span class="alert-icon">⚠️</span>
+                        <div class="alert-content">
+                            <div class="alert-title">법적 문서</div>
+                            본 헌장은 28개 서명국의 비준을 받은 국제 조약으로, 모든 조항은 법적 구속력을 갖습니다.
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--primary); margin-top: 1.5rem;">전문</h3>
+                    <p style="line-height: 1.8; margin: 1rem 0; padding: 1rem; background: var(--bg-main); border-radius: 6px;">
+                        우리는, 프래그먼트의 무분별한 발현으로 인한 재난을 목도하였으며, 고파 참사가 증명한 바와 같이 개별 국가의 역량만으로는 이야기의 힘을 통제할 수 없음을 인정하고, 인류의 안전과 역사적 유산의 보존이라는 두 가치를 조화시키기 위하여, 프래그먼트의 수집, 연구, 보관 및 관리를 전담하는 모네타 시스템을 국제적으로 인정하고 지원하며 보증한다.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">제1장: 총칙</h2>
+                </div>
+                <div class="card-body">
+                    <h4 style="color: var(--primary); margin-bottom: 0.5rem;">제1조 (기관의 명칭 및 성격)</h4>
+                    <p style="margin-bottom: 1rem; line-height: 1.7;">본 기관의 명칭은 "모네타"로 하며, 서명국들의 합의에 기초한 국제 독립기관으로서 특정 국가에 종속되지 아니한다.</p>
+
+                    <h4 style="color: var(--primary); margin: 1rem 0 0.5rem;">제2조 (목적)</h4>
+                    <p style="margin-bottom: 1rem; line-height: 1.7;">모네타는 프래그먼트로 인한 인명 피해 및 재난 예방, 프래그먼트의 체계적 수집 및 안전한 보관, 프래그먼트 관련 학술 연구 및 지식 축적, 프래그먼트 사고 발생 시 신속한 대응, 국제 협력 증진을 목적으로 한다.</p>
+
+                    <h4 style="color: var(--primary); margin: 1rem 0 0.5rem;">제3조 (기본 원칙)</h4>
+                    <ul style="margin-left: 1.5rem; line-height: 1.8;">
+                        <li><strong>비사용 원칙:</strong> 모네타는 프래그먼트를 발동시키지 않는 것을 원칙으로 한다.</li>
+                        <li><strong>보존 우선 원칙:</strong> 프래그먼트의 파괴는 최후의 수단으로만 고려한다.</li>
+                        <li><strong>생명 우선 원칙:</strong> 인명 보호는 프래그먼트 보존에 우선한다.</li>
+                        <li><strong>중립성 원칙:</strong> 모네타는 국가 간 분쟁에 개입하지 않으며, 정치적 중립을 유지한다.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">제2장: 조직 구조</h2>
+                </div>
+                <div class="card-body">
+                    <h4 style="color: var(--primary); margin-bottom: 0.5rem;">제5조 (최고 지도부)</h4>
+                    <p style="margin-bottom: 1rem; line-height: 1.7;">모네타의 최고 책임자는 기관장으로 하며, 부기관장은 기관장을 보좌한다. 기관장 및 부기관장의 교체는 원칙적으로 사망 또는 영구적 직무 수행 불능 시에 한한다.</p>
+
+                    <h4 style="color: var(--primary); margin: 1rem 0 0.5rem;">제6조 (부서 구성)</h4>
+                    <p style="margin-bottom: 0.5rem; line-height: 1.7;">모네타는 프래그먼트의 특성에 따라 다음의 전문 부서를 둔다:</p>
+                    <ul style="margin-left: 1.5rem; line-height: 1.8;">
+                        <li>도서관: 서적, 문서, 사진, 편지</li>
+                        <li>무훈실: 무기, 방어구, 전쟁 유물</li>
+                        <li>오케스트라: 악기, 악보, 음악 관련 물품</li>
+                        <li>미술관: 회화, 조각, 예술 작품</li>
+                        <li>의상실: 의상, 장신구, 직물</li>
+                        <li>일상유물관: 상기 범주에 속하지 않는 모든 물품</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">제3장: 프래그먼트 관리</h2>
+                </div>
+                <div class="card-body">
+                    <h4 style="color: var(--primary); margin-bottom: 0.5rem;">제14조 (분류 체계)</h4>
+                    <p style="margin-bottom: 1rem; line-height: 1.7;">프래그먼트는 위험도와 관리난이도로 이원 분류한다.</p>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>위험도 등급</th>
+                                    <th>정의</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="badge badge-safe">안전</span></td>
+                                    <td>일상 조건에서 발동하지 않으며, 발동 시 경미한 영향</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-caution">주의</span></td>
+                                    <td>발동 조건 명확, 발동 시 상해/재산 피해 가능</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-hazard">위험</span></td>
+                                    <td>불의의 발동 가능, 발동 시 심각한 피해</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-catastrophic">재난</span></td>
+                                    <td>대규모 인명 피해 또는 불가역적 재난 유발</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h4 style="color: var(--primary); margin: 1.5rem 0 0.5rem;">제15조 (접근 권한)</h4>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>등급</th>
+                                    <th>권한</th>
+                                    <th>대상자</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>1등급</strong></td>
+                                    <td>대여 가능</td>
+                                    <td>일반인 대여 허용</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>2등급</strong></td>
+                                    <td>공개 가능</td>
+                                    <td>일반인 관람 허용</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>3등급</strong></td>
+                                    <td>직원 사용 가능</td>
+                                    <td>업무 목적 사용</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>4등급</strong></td>
+                                    <td>직원 공개 가능</td>
+                                    <td>열람만 허용</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>5등급</strong></td>
+                                    <td>임무 시 사용</td>
+                                    <td>해결사팀 한정</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>6등급</strong></td>
+                                    <td>부서장 허가 필요</td>
+                                    <td>부서장 승인</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>7등급</strong></td>
+                                    <td>부기관장 허가 필요</td>
+                                    <td>부기관장 승인</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>8등급</strong></td>
+                                    <td>기관장 허가 필요</td>
+                                    <td>기관장 승인</td>
+                                </tr>
+                                <tr style="background: #ffebee;">
+                                    <td><strong>9등급</strong></td>
+                                    <td>사용 불가</td>
+                                    <td>보존만 허용</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">제4장: 사고 대응</h2>
+                </div>
+                <div class="card-body">
+                    <h4 style="color: var(--primary); margin-bottom: 0.5rem;">제20조 (사고의 정의)</h4>
+                    <p style="margin-bottom: 1rem; line-height: 1.7;">"사고"란 프래그먼트가 관련된 예기치 않은 발동, 분실/도난/유출, 불법적 사용, 보관 중 이상 징후를 말한다.</p>
+
+                    <h4 style="color: var(--primary); margin: 1rem 0 0.5rem;">제22조 (해결사팀의 권한)</h4>
+                    <p style="line-height: 1.7;">해결사팀은 프래그먼트 사고 현장에서 현장 접근 통제, 프래그먼트 임시 확보, 목격자 진술 청취, 지역 당국 협조 요청, 긴급 시 프래그먼트 발동 또는 파괴 권한을 가진다.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">제7장: 대외 관계</h2>
+                </div>
+                <div class="card-body">
+                    <h4 style="color: var(--primary); margin-bottom: 0.5rem;">제35조 (서명국과의 관계)</h4>
+                    <p style="margin-bottom: 1rem; line-height: 1.7;">모네타는 서명국과 프래그먼트 사고 공동 대응, 정보 공유, 법 집행 지원, 프래그먼트 연구 협력 등을 수행한다. 서명국은 모네타 활동에 대한 법적 보호, 필요 시 군사·경찰 협조, 외교적 지원을 제공한다.</p>
+
+                    <h4 style="color: var(--primary); margin: 1rem 0 0.5rem;">제37조 (민간과의 관계)</h4>
+                    <p style="line-height: 1.7;">개인이나 단체가 프래그먼트를 소유하는 것은 그 자체로 불법이 아니다. 모네타는 소유자와 자발적 기증 접수, 유상 매입, 보관 위탁 계약, 공동 관리 협정 등의 형태로 협력한다.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 지역 정보 섹션 -->
+        <section id="world" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title">🗺️ 지역 정보</h1>
+                </div>
+                <div class="card-body">
+                    <div id="worldMap" class="world-map-visual"></div>
+                </div>
+            </div>
+
+            <h2 style="color: var(--primary); margin: 2rem 0 1rem;">대륙별 상세 정보</h2>
+
+            <div class="continent-grid">
+                <div class="continent-card">
+                    <div class="continent-name">🏔️ 노르덴</div>
+                    <div class="continent-info">
+                        <div class="info-item">
+                            <div class="info-label">기후</div>
+                            <div class="info-value">한랭 (극지~냉대)</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">문화</div>
+                            <div class="info-value">전사 문화, 구전 전통</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">프랙트 특징</div>
+                            <div class="info-value">무기/전쟁 관련 다수</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="continent-card">
+                    <div class="continent-name">⚓ 시벤트</div>
+                    <div class="continent-info">
+                        <div class="info-item">
+                            <div class="info-label">기후</div>
+                            <div class="info-value">온대 (사계절 뚜렷)</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">문화</div>
+                            <div class="info-value">상업 발달, 해양 국가</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">프랙트 특징</div>
+                            <div class="info-value">교역품, 계약서 관련</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="continent-card headquarters">
+                    <div class="continent-name" style="color: var(--danger);">🏜️ 아스트랄 ★</div>
+                    <div class="continent-info">
+                        <div class="info-item">
+                            <div class="info-label">기후</div>
+                            <div class="info-value">사막/건조 (중부)</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">문화</div>
+                            <div class="info-value">고대 문명 유적 다수</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">중요 사건</div>
+                            <div class="info-value" style="color: var(--danger); font-weight: 600;">고파 참사 발생지</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">특이사항</div>
+                            <div class="info-value" style="color: var(--primary); font-weight: 600;">모네타 본부 소재</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="continent-card">
+                    <div class="continent-name">📚 오리엔탈</div>
+                    <div class="continent-info">
+                        <div class="info-item">
+                            <div class="info-label">기후</div>
+                            <div class="info-value">아열대~열대 (다습)</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">문화</div>
+                            <div class="info-value">학문 중심, 대도시</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">프랙트 특징</div>
+                            <div class="info-value">서적, 학술 관련 풍부</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="continent-card">
+                    <div class="continent-name">🌋 오스테라</div>
+                    <div class="continent-info">
+                        <div class="info-item">
+                            <div class="info-label">기후</div>
+                            <div class="info-value">다양 (소규모 대륙)</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">문화</div>
+                            <div class="info-value">최근 발견, 미지 영역</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">프랙트 특징</div>
+                            <div class="info-value">토착 신화, 신종 위험</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">지부 네트워크</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>지부</th>
+                                    <th>위치</th>
+                                    <th>설립</th>
+                                    <th>직원</th>
+                                    <th>상태</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background: #fff3e0;">
+                                    <td><strong>본부</strong></td>
+                                    <td>아스트랄 대륙 사하린 연맹</td>
+                                    <td>565년</td>
+                                    <td>1,200명</td>
+                                    <td><span class="badge badge-safe">운영 중</span></td>
+                                </tr>
+                                <tr>
+                                    <td>노르덴 지부</td>
+                                    <td>노르덴 대륙</td>
+                                    <td>572년</td>
+                                    <td>480명</td>
+                                    <td><span class="badge badge-safe">운영 중</span></td>
+                                </tr>
+                                <tr>
+                                    <td>시벤트 지부</td>
+                                    <td>시벤트 대륙</td>
+                                    <td>570년</td>
+                                    <td>520명</td>
+                                    <td><span class="badge badge-safe">운영 중</span></td>
+                                </tr>
+                                <tr>
+                                    <td>오리엔탈 지부</td>
+                                    <td>오리엔탈 대륙</td>
+                                    <td>568년</td>
+                                    <td>620명</td>
+                                    <td><span class="badge badge-safe">운영 중</span></td>
+                                </tr>
+                                <tr>
+                                    <td>오스테라 지부</td>
+                                    <td>오스테라 대륙</td>
+                                    <td>610년</td>
+                                    <td>380명</td>
+                                    <td><span class="badge badge-caution">확장 중</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 프래그먼트 목록 섹션 -->
+        <section id="fragments" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title">🔒 프래그먼트 목록</h1>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <span class="alert-icon">🔒</span>
+                        <div class="alert-content">
+                            <div class="alert-title">기밀 정보</div>
+                            <span id="fragmentClearanceText">3등급 권한으로 제한된 정보만 열람 가능합니다.</span>
+                        </div>
+                    </div>
+
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="프래그먼트 검색..." id="fragmentSearch">
+                        <select class="filter-select" id="dangerFilter">
+                            <option value="all">전체 위험도</option>
+                            <option value="safe">안전</option>
+                            <option value="caution">주의</option>
+                            <option value="hazard">위험</option>
+                            <option value="catastrophic">재난</option>
+                        </select>
+                        <select class="filter-select" id="managementFilter">
+                            <option value="all">전체 관리등급</option>
+                            <option value="1">1등급</option>
+                            <option value="2">2등급</option>
+                            <option value="3">3등급</option>
+                            <option value="4">4등급</option>
+                            <option value="5">5등급</option>
+                        </select>
+                        <select class="filter-select" id="accessFilter">
+                            <option value="all">전체 접근권한</option>
+                            <option value="1">1등급</option>
+                            <option value="2">2등급</option>
+                            <option value="3">3등급</option>
+                            <option value="4">4등급</option>
+                            <option value="5">5등급</option>
+                            <option value="6">6등급</option>
+                            <option value="7">7등급</option>
+                            <option value="8">8등급</option>
+                            <option value="9">9등급</option>
+                        </select>
+                        <select class="filter-select" id="deptFilter">
+                            <option value="all">전체 부서</option>
+                            <option value="lib">도서관</option>
+                            <option value="ars">무훈실</option>
+                            <option value="orc">오케스트라</option>
+                            <option value="gal">미술관</option>
+                            <option value="war">의상실</option>
+                            <option value="rep">일상유물관</option>
+                        </select>
+                    </div>
+                    <div id="fragmentCount" class="text-muted" style="margin-top: 0.5rem;"></div>
+                </div>
+            </div>
+
+            <div id="fragmentsContainer"></div>
+
+            <div id="restrictedMessage" class="card" style="display: none;">
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <span class="alert-icon">🔒</span>
+                        <div class="alert-content">
+                            <div class="alert-title">접근 권한 부족</div>
+                            일부 프래그먼트는 현재 보안 등급으로 열람할 수 없습니다. 상위 권한이 필요합니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 기관 연혁 섹션 -->
+        <section id="timeline" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title">📅 모네타 기관 연혁</h1>
+                </div>
+            </div>
+
+            <div class="timeline" id="timelineContainer"></div>
+        </section>
+    </div>
+
+    <footer style="background: var(--bg-card); padding: 2rem; text-align: center; margin-top: 3rem; border-top: 1px solid var(--border);">
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">
+            <strong style="color: var(--text-primary);">모네타 내부 데이터베이스 시스템</strong><br>
+            아스트랄 대륙 사하린 연맹 중립 구역 | 설립 565년 | 서명국 28개국<br>
+            <span style="font-size: 0.8rem; opacity: 0.7;">
+                "이야기는 살아있다. 우리는 그것을 지킨다."
+            </span>
+        </p>
+    </footer>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
